@@ -356,7 +356,7 @@ typedef enum
 - (void)viewWillDisappear:(BOOL)animated
 {
     [self setEditing:NO animated:YES];
-//    [self.navigationController setToolbarHidden:TRUE];
+    [self.navigationController setToolbarHidden:TRUE];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
