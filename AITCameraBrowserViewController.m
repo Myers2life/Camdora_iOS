@@ -257,7 +257,6 @@ typedef enum
     //改
     popViewCtl = [[AITPopoverViewController alloc] init];
     popViewCtl.delegate = self;
-    fileProperty = [NSString stringWithFormat:@"%@",TAG_DCIM];
     //改
     
     // Set editing mode to false by default
@@ -304,6 +303,7 @@ typedef enum
     cmd_tag = CAMERA_FILE_LIST;
     fetch_try_cnt = 3;
     //改
+    fileProperty = [NSString stringWithFormat:@"%@",TAG_DCIM];
     cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFirstFileUrl:fetchSize Property: fileProperty] Delegate:self] ;
     //改
 }
@@ -391,7 +391,7 @@ static NSString *TAG_amount = @"amount" ;
                     fileNode.blValid = TRUE;
                     fileNode.progress = -1;
                     [tempFileNodes addObject: fileNode] ;
-//                    NSLog(@"Added file \"%@\" into fileNode\n", fileNode.name) ;
+                    NSLog(@"Added file \"%@\" into fileNode\n", fileNode.name) ;
                 } else if ([[dcimChild name] isEqualToString:TAG_amount]) {
                     amount = [[dcimChild stringValue] intValue] ;
                 } else {
