@@ -14,6 +14,7 @@
 #import "GDataXMLNode.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "UINavagationHelper.h"
+#import "AITLocalAlbumViewController.h"
 //#import "VLCMovieViewController.h"
 
 typedef enum
@@ -50,6 +51,16 @@ typedef enum
     NSString *fileProperty;
     NSString *currentFileList;
     //改
+    
+    //改
+    UIBarButtonItem *saveButton;
+    UIBarButtonItem *deleteButton;
+    UIBarButtonItem *cancelButton;
+    UIBarButtonItem *switchButton;
+    UIBarButtonItem *flexibleSpace;
+    UIBarButtonItem *localAlbumButton;
+    IBOutlet UIView * localAlbumView;
+    AITLocalAlbumViewController *localAlbumViewController;
 }
 @end
 
@@ -85,7 +96,15 @@ typedef enum
     if (editing) {
         // show toolbar
         [self.navigationItem setHidesBackButton: YES];
-        [self.navigationController setToolbarHidden:FALSE];
+//        [self.navigationController setToolbarHidden:FALSE];
+            [self setToolbarItems:[NSArray arrayWithObjects:deleteButton,
+                                                            flexibleSpace,
+                                                            saveButton,
+                                                            flexibleSpace,
+                                                            cancelButton,
+                                                            flexibleSpace,
+                                                            switchButton,
+                                                            nil] animated:YES];
         // TODO: Show selected marker
         for (i = 0; i < total; i++) {
             AITFileNode *fileNode = [fileNodes objectAtIndex:i];
@@ -107,7 +126,8 @@ typedef enum
                 fileNode.selected = NO;
         }
         // remove toolbar
-        [self.navigationController setToolbarHidden:TRUE];
+        [self setToolbarItems: [NSArray arrayWithObjects:flexibleSpace,localAlbumButton,flexibleSpace,nil]];
+        //        [self.navigationController setToolbarHidden:TRUE];
         [self.navigationItem setHidesBackButton: NO];
     }
 }
@@ -187,6 +207,17 @@ typedef enum
     [self presentViewController:popViewCtl animated:YES completion:nil];
 }
 //改
+//改
+- (IBAction)buttonLocaAlbum:(id)sender {
+    
+    if (localAlbumViewController == nil) {
+        localAlbumViewController = [[AITLocalAlbumViewController alloc] initWithNibName:@"AITLocalAlbumViewController" bundle:nil] ;
+    }
+    localAlbumViewController.edgesForExtendedLayout = UIRectEdgeNone;
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style: UIBarButtonItemStylePlain target:nil action:nil] ;
+    [self.navigationController pushViewController:localAlbumViewController animated:YES];
+}
+//改
 
 - (void)deleteNext:(int) from
 {
@@ -233,26 +264,29 @@ typedef enum
     [self.navigationItem setCustomTitleView];
 
     
-    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Save", nil) style:UIBarButtonItemStyleDone target:self action:@selector(buttonSave:)];
+    saveButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Save", nil) style:UIBarButtonItemStyleDone target:self action:@selector(buttonSave:)];
     
-    UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(buttonDelete:)];
+    deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(buttonDelete:)];
     
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleDone target:self action:@selector(buttonCancel:)];
+    cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleDone target:self action:@selector(buttonCancel:)];
     //改
     currentFileList = [NSString stringWithFormat:@"%@",TAG_DCIM];
-    UIBarButtonItem *switchButton = [[UIBarButtonItem alloc] initWithTitle:currentFileList style:UIBarButtonItemStyleDone target:self action:@selector(buttonSwitch:)];
-    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    switchButton = [[UIBarButtonItem alloc] initWithTitle:currentFileList style:UIBarButtonItemStyleDone target:self action:@selector(buttonSwitch:)];
+    flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
-    [self setToolbarItems:[NSArray arrayWithObjects:deleteButton,
-                                                    flexibleSpace,
-                                                    saveButton,
-                                                    flexibleSpace,
-                                                    cancelButton,
-                                                    flexibleSpace,
-                                                    switchButton,
-                                                    nil] animated:YES];
     //改
-    [self.navigationController setToolbarHidden:TRUE];
+    
+    localAlbumButton = [[UIBarButtonItem alloc] initWithCustomView: localAlbumView];
+    [self setToolbarItems: [NSArray arrayWithObjects:flexibleSpace,localAlbumButton,flexibleSpace,nil]];
+//    [self setToolbarItems:[NSArray arrayWithObjects:deleteButton,
+//                                                    flexibleSpace,
+//                                                    saveButton,
+//                                                    flexibleSpace,
+//                                                    cancelButton,
+//                                                    flexibleSpace,
+//                                                    switchButton,
+//                                                    nil] animated:YES];
+    //改
     
     //改
     popViewCtl = [[AITPopoverViewController alloc] init];
@@ -265,6 +299,7 @@ typedef enum
     UINib *nib = [UINib nibWithNibName:@"AITFileCell" bundle:nil];
     
     [self.tableView registerNib:nib forCellReuseIdentifier:[AITFileCell reuseIdentifier]] ;
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -306,6 +341,9 @@ typedef enum
     fileProperty = [NSString stringWithFormat:@"%@",TAG_DCIM];
     cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFirstFileUrl:fetchSize Property: fileProperty] Delegate:self] ;
     //改
+    
+    [self.navigationController setToolbarHidden:FALSE];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -318,7 +356,7 @@ typedef enum
 - (void)viewWillDisappear:(BOOL)animated
 {
     [self setEditing:NO animated:YES];
-    [self.navigationController setToolbarHidden:TRUE];
+//    [self.navigationController setToolbarHidden:TRUE];
 }
 
 - (void)viewDidDisappear:(BOOL)animated

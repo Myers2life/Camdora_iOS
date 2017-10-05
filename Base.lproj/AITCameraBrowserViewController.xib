@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AITCameraBrowserViewController">
+            <connections>
+                <outlet property="localAlbumView" destination="VS6-sO-GBu" id="Ox6-zv-nRZ"/>
+                <outlet property="view" destination="4" id="5"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" bouncesZoom="NO" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelection="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="4">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <connections>
+                <outlet property="dataSource" destination="-1" id="6"/>
+                <outlet property="delegate" destination="-1" id="7"/>
+            </connections>
+            <point key="canvasLocation" x="43" y="-245"/>
+        </tableView>
+        <view contentMode="scaleToFill" id="VS6-sO-GBu">
+            <rect key="frame" x="0.0" y="0.0" width="164" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="album_button" translatesAutoresizingMaskIntoConstraints="NO" id="uKD-Js-8Nv">
+                    <rect key="frame" x="0.0" y="0.0" width="44" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="uKD-Js-8Nv" secondAttribute="height" multiplier="1:1" id="B8w-q2-r6v"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Local Album" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Twy-HJ-1wW">
+                    <rect key="frame" x="52" y="0.0" width="112" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="112" id="qmy-d4-eMi"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rE3-OC-it0">
+                    <rect key="frame" x="0.0" y="0.0" width="164" height="44"/>
+                    <connections>
+                        <action selector="buttonLocaAlbum:" destination="-1" eventType="touchUpInside" id="NlH-fL-Deh"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Twy-HJ-1wW" secondAttribute="trailing" id="4ki-LM-OHl"/>
+                <constraint firstAttribute="bottom" secondItem="rE3-OC-it0" secondAttribute="bottom" id="71T-WG-6RB"/>
+                <constraint firstItem="Twy-HJ-1wW" firstAttribute="top" secondItem="VS6-sO-GBu" secondAttribute="top" id="LYt-zz-g6z"/>
+                <constraint firstItem="rE3-OC-it0" firstAttribute="top" secondItem="VS6-sO-GBu" secondAttribute="top" id="OCj-Ey-YjP"/>
+                <constraint firstItem="rE3-OC-it0" firstAttribute="leading" secondItem="VS6-sO-GBu" secondAttribute="leading" id="T2I-AS-0aR"/>
+                <constraint firstItem="Twy-HJ-1wW" firstAttribute="leading" secondItem="uKD-Js-8Nv" secondAttribute="trailing" constant="8" symbolic="YES" id="Vsy-8k-RiH"/>
+                <constraint firstItem="uKD-Js-8Nv" firstAttribute="leading" secondItem="VS6-sO-GBu" secondAttribute="leading" id="e7W-uo-ujp"/>
+                <constraint firstAttribute="bottom" secondItem="Twy-HJ-1wW" secondAttribute="bottom" id="enJ-PH-64l"/>
+                <constraint firstAttribute="bottom" secondItem="uKD-Js-8Nv" secondAttribute="bottom" id="gVl-aK-dB9"/>
+                <constraint firstAttribute="trailing" secondItem="rE3-OC-it0" secondAttribute="trailing" id="jIg-3H-2b3"/>
+                <constraint firstItem="uKD-Js-8Nv" firstAttribute="top" secondItem="VS6-sO-GBu" secondAttribute="top" id="uhP-XI-dNP"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="182" y="-706"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="album_button" width="92" height="92"/>
+    </resources>
+</document>
