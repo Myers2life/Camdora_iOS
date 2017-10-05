@@ -27,7 +27,7 @@ typedef enum
 {
     UIActivityIndicatorView *indicator;
     NSMutableArray *fileNodes ;
-    AITPopoverViewController *popViewCtl;
+
     int fetch_try_cnt;
     int fetchSize ;
     int fileDelCount;
@@ -43,6 +43,13 @@ typedef enum
     int activeIndex;
     NSTimer *dlTimer;
     CAMERA_cmd_t   cmd_tag;
+    //改
+    NSMutableArray *fileNodesAVI;
+    NSMutableArray *fileNodesJPG;
+    AITPopoverViewController *popViewCtl;
+    NSString *fileProperty;
+    NSString *currentFileList;
+    //改
 }
 @end
 
@@ -166,6 +173,8 @@ typedef enum
 - (IBAction) buttonDelete:(id)sender {
     [self deleteNext:0];
 }
+
+//改
 - (IBAction)buttonSwitch:(id)sender {
     
     popViewCtl.modalPresentationStyle = UIModalPresentationPopover;
@@ -177,6 +186,7 @@ typedef enum
     popViewCtl.popoverPresentationController.delegate = self;
     [self presentViewController:popViewCtl animated:YES completion:nil];
 }
+//改
 
 - (void)deleteNext:(int) from
 {
@@ -228,9 +238,9 @@ typedef enum
     UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(buttonDelete:)];
     
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleDone target:self action:@selector(buttonCancel:)];
-
-    UIBarButtonItem *switchButton = [[UIBarButtonItem alloc] initWithTitle:@"DCIM" style:UIBarButtonItemStyleDone target:self action:@selector(buttonSwitch:)];
-    
+    //改
+    currentFileList = [NSString stringWithFormat:@"%@",TAG_DCIM];
+    UIBarButtonItem *switchButton = [[UIBarButtonItem alloc] initWithTitle:currentFileList style:UIBarButtonItemStyleDone target:self action:@selector(buttonSwitch:)];
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
     [self setToolbarItems:[NSArray arrayWithObjects:deleteButton,
@@ -241,17 +251,21 @@ typedef enum
                                                     flexibleSpace,
                                                     switchButton,
                                                     nil] animated:YES];
+    //改
     [self.navigationController setToolbarHidden:TRUE];
     
+    //改
     popViewCtl = [[AITPopoverViewController alloc] init];
     popViewCtl.delegate = self;
+    fileProperty = [NSString stringWithFormat:@"%@",TAG_DCIM];
+    //改
+    
     // Set editing mode to false by default
     self.tableView.editing = FALSE;
     
     UINib *nib = [UINib nibWithNibName:@"AITFileCell" bundle:nil];
     
     [self.tableView registerNib:nib forCellReuseIdentifier:[AITFileCell reuseIdentifier]] ;
-//    self.tableView.tableFooterView = [[UIView alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -269,17 +283,29 @@ typedef enum
     
     if(fileNodes == nil)
         fileNodes = [[NSMutableArray alloc] init];
+    //改
+    if (fileNodesAVI == nil) {
+        fileNodesAVI = [[NSMutableArray alloc] init];
+    }
+    if (fileNodesJPG == nil) {
+        fileNodesJPG = [[NSMutableArray alloc] init];
+    }
     if ([self isRunning]) {
         return;
     }
+    [fileNodesAVI removeAllObjects];
+    [fileNodesJPG removeAllObjects];
     [fileNodes removeAllObjects];
+    //改
     [self.tableView reloadData];
     fetchSize = 16;
     fetchStopped = NO ;
     fetchFirst = YES ;
     cmd_tag = CAMERA_FILE_LIST;
     fetch_try_cnt = 3;
-    cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFirstFileUrl:fetchSize] Delegate:self] ;
+    //改
+    cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFirstFileUrl:fetchSize Property: fileProperty] Delegate:self] ;
+    //改
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -349,6 +375,7 @@ static NSString *TAG_amount = @"amount" ;
             //NSLog(@"dcimElement = %@\n", dcimElement.name) ;
             int amount = -1;
             NSArray *dcimChildren = [dcimElement children] ;
+            NSMutableArray *tempFileNodes = [[NSMutableArray alloc] initWithCapacity:3];
             for (GDataXMLElement *dcimChild in dcimChildren) {
                 if ([[dcimChild name] isEqualToString:TAG_file]) {
 //                    NSArray *fileChildren = [dcimChild children] ;
@@ -363,7 +390,7 @@ static NSString *TAG_amount = @"amount" ;
                     fileNode.time = [[self getFirstChild:dcimChild WithName:TAG_time] stringValue] ;
                     fileNode.blValid = TRUE;
                     fileNode.progress = -1;
-                    [fileNodes addObject: fileNode] ;
+                    [tempFileNodes addObject: fileNode] ;
 //                    NSLog(@"Added file \"%@\" into fileNode\n", fileNode.name) ;
                 } else if ([[dcimChild name] isEqualToString:TAG_amount]) {
                     amount = [[dcimChild stringValue] intValue] ;
@@ -371,12 +398,26 @@ static NSString *TAG_amount = @"amount" ;
                     NSLog(@"ERROR TRY!!");
                 }
             }
+            //改
+            if ([fileProperty isEqualToString:TAG_DCIM]) {
+                [fileNodesAVI addObjectsFromArray:tempFileNodes];
+            } else {
+                [fileNodesJPG addObjectsFromArray:tempFileNodes];
+            }
+            //改
             if ((amount == fetchSize || amount == -1) && !fetchStopped) {
                 cmd_tag = CAMERA_FILE_LIST;
-                cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFileUrl:fetchSize From:(unsigned int)[fileNodes count]] Delegate:self] ;
+                cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFileUrl:fetchSize From:(unsigned int)[fileNodes count] Property:fileProperty] Delegate:self] ;
             } else {
                 NSLog(@"List DONE");
-                [indicator stopAnimating];
+                //改
+                if ([fileProperty isEqualToString:TAG_DCIM]) {
+                    fileProperty = [NSString stringWithFormat:@"%@",TAG_Photo];
+                    cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFirstFileUrl:fetchSize Property:fileProperty] Delegate:self] ;
+                } else {
+                    [indicator stopAnimating];
+                }
+                //改
             }
         
         } else {
@@ -384,7 +425,9 @@ static NSString *TAG_amount = @"amount" ;
             while (fetch_try_cnt) {
                 fetch_try_cnt--;
                 cmd_tag = CAMERA_FILE_LIST;
-                cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFileUrl:fetchSize From:(unsigned int)[fileNodes count]] Delegate:self] ;
+                //改
+                cameraCommand = [[AITCameraCommand alloc] initWithUrl:[AITCameraCommand commandListFileUrl:fetchSize From:(unsigned int)[fileNodes count] Property:fileProperty] Delegate:self] ;
+                //改
                 return;
             }
             [indicator stopAnimating];
@@ -397,6 +440,13 @@ static NSString *TAG_amount = @"amount" ;
             [alert show] ;
 
         }
+        //改
+        if ([currentFileList isEqualToString:TAG_DCIM]) {
+            fileNodes = fileNodesAVI;
+        } else {
+            fileNodes = fileNodesJPG;
+        }
+        //改
         [self.tableView reloadData] ;
     } else if (cmd_tag == CAMERA_FILE_DELETE) {
         //Get file deletion response
@@ -545,6 +595,7 @@ static NSString *TAG_amount = @"amount" ;
     return YES;
 }
 */
+//改
 #pragma mark - UIPopoverPresentationControllerDelegate
 -(UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController*)controller{
     return UIModalPresentationNone;
@@ -553,14 +604,21 @@ static NSString *TAG_amount = @"amount" ;
 #pragma mark - AITPopoverViewControllerDelegate
 -(void)clickItem:(AITFileType)type {
     UIBarButtonItem *barButton = [self.toolbarItems lastObject];
-    if (type == ATIDCIM) {
+    if (type == ATIDCIM && ![currentFileList isEqualToString:TAG_DCIM]) {
         NSLog(@"click dcim");
+        currentFileList = [NSString stringWithFormat:@"%@",TAG_DCIM];
         [barButton setTitle:TAG_DCIM];
-    } else if (type == ATIPhoto) {
+        fileNodes = fileNodesAVI;
+        [self.tableView reloadData];
+    } else if (type == ATIPhoto && ![currentFileList isEqualToString:TAG_Photo]) {
         NSLog(@"click photo");
         [barButton setTitle:TAG_Photo];
+        currentFileList = [NSString stringWithFormat:@"%@",TAG_Photo];
+        fileNodes = fileNodesJPG;
+        [self.tableView reloadData];
     }
 }
+//改
 
 #pragma mark - Table view delegate
 
@@ -613,14 +671,16 @@ static NSString *TAG_amount = @"amount" ;
     //[cell setAccessoryType:UITableViewCellAccessoryNone];
     NSLog(@"Deselect <<%@", cell.filePath) ;
 }
+//改
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *sectionHeader = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 375, 20)];
     UILabel *titleLable = [[UILabel alloc] initWithFrame:CGRectMake(16, 0, 375, 20)];
-    titleLable.text = @"File Browser: DCIM(0 items)";
+    titleLable.text = [NSString stringWithFormat:@"File Browser: %@(%ld items)",currentFileList,[fileNodes count]];
     [sectionHeader addSubview:titleLable];
     
     return sectionHeader;
 }
+//改
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 20.0;
